@@ -1,20 +1,8 @@
-# Data directories
-data/raw/*
-data/filtered/*
-data/warehouse/*
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Environment
+.venv
+/data
+/scripts/__pycache*
+/yolov5
+/notebbooks/medical-detection
+/notebbooks/medical-products-1
+/runs
 .env
-venv/
-
-# Jupyter
-*.ipynb_checkpoints
-
-# Docker
-*.log
