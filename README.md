@@ -2,7 +2,7 @@
 
 ## Project: Building a Data Warehouse for Ethiopian Medical Business Data
 
-**Date:** July 09 - March 15, 2024
+**Date:** July 09 - july 15, 2025
 
 **Overview:**
 
@@ -183,21 +183,208 @@ Kara Solutions, a leading data science company, requires a data warehouse to cen
 
 2.  **Project Structure (Example):**
 
-    ```
-    my_project/
-    ├── main.py
-    ├── database.py
-    ├── models.py
-    ├── schemas.py
-    └── crud.py
-    ```
+        ```
+        my_project/
+        ├── main.py
+        ├── database.py
+        ├── models.py
+        ├── schemas.py
+        └── crud.py
+        ```
 
-    **Running the FastAPI application:**
+        **Running the FastAPI application:**
 
-    ```bash
-    uvicorn main:app --reload
-    ```
+        ```bash
+        uvicorn main:app --reload
+        ```
+
+         Add Environment & Orchestration
+
+    Add how you’ll orchestrate the whole flow:
+
+markdown
+Copy
+Edit
+
+### Orchestration and Automation
+
+To automate the data pipeline — from scraping to transformation — Dagster or Airflow can be used.
+
+**Example:**
+
+- **Dagster:** Define separate jobs for scraping, cleaning, YOLO detection, DBT runs, and API refresh.
+- Schedule pipelines to run hourly/daily.
+- Monitor runs & handle retries automatically.
+
+> _Setup Example:_
+>
+> ```bash
+> pip install dagster dagit
+> dagster project scaffold -m medical_dw_pipeline
+> dagit -f my_pipeline.py
+> ```
+>
+> Add Dockerization
+> Add a clear note on how Docker packages all parts:
+
+markdown
+Copy
+Edit
+
+### Dockerization
+
+To ensure portability, the scraper, YOLO, DBT, and FastAPI will run inside containers.
+
+**Files:**
+
+- `Dockerfile` for FastAPI & Python scripts.
+- `docker-compose.yml` to spin up:
+  - PostgreSQL
+  - FastAPI server
+  - Optional: separate worker container for scraping & YOLO tasks.
+    Add .env Example
+    markdown
+    Copy
+    Edit
+
+### Environment Variables
+
+Add a `.env` file to store secrets:
+
+````env
+POSTGRES_USER=myuser
+POSTGRES_PASSWORD=mypassword
+POSTGRES_DB=medical_dw
+DATABASE_URL=postgresql://myuser:mypassword@db:5432/medical_dw
+TELEGRAM_API_ID=YOUR_TELEGRAM_ID
+TELEGRAM_API_HASH=YOUR_TELEGRAM_HASH
+yaml
+Copy
+Edit
+
+---
+
+Add CI/CD**
+
+```markdown
+### CI/CD Automation
+
+Use GitHub Actions to:
+- Run DBT models on push.
+- Run unit tests for API.
+- Lint Python scripts.
+
+**Example `.github/workflows/main.yml`**
+
+```yaml
+name: CI Pipeline
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+    - name: Run DBT
+      run: |
+        dbt run
+    - name: Run tests
+      run: |
+        pytest
+yaml
+Copy
+Edit
+
+---
+
+Add ERD (Schema) Example**
+
+```markdown
+### Database Schema (ERD)
+
+**Tables:**
+- `raw_messages`: id, text, date, channel
+- `images`: id, file_name, related_message_id
+- `detected_objects`: id, image_id, label, confidence, bbox coords
+- `businesses`: id, name, category
+
+**Relationships:**
+- `raw_messages` ➜ `images` ➜ `detected_objects`
+- `businesses` link to `raw_messages` for context
+Add Security & Docs
+markdown
+Copy
+Edit
+### API Security & Docs
+
+Add:
+- JWT token auth or API key auth.
+- Automatic docs with Swagger (`/docs`) via FastAPI.
+- Example:
+
+```python
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    # Verify & decode JWT
+    return token
+yaml
+Copy
+Edit
+
+---
+
+ Add Testing**
+
+```markdown
+### Testing
+
+- Use `pytest` to test:
+  - Scraper output
+  - DBT transformation checks
+  - API endpoints
+
+**Example:**
+
+```python
+from fastapi.testclient import TestClient
+from main import app
+
+client = TestClient(app)
+
+def test_root():
+    response = client.get("/")
+    assert response.status_code == 200
+yaml
+Copy
+Edit
+
+---
+
+ Add Future Improvements**
+
+```markdown
+### Future Improvements
+
+- Add dashboards (Metabase, Superset)
+- Add versioned data lake (S3, MinIO)
+- Add alerting (Prometheus + Grafana)
+- Retrain YOLO on local images for custom detection
 
 ## Conclusion:
 
 This project successfully demonstrates the end-to-end process of building a data warehouse solution for a real-world business need. By combining data scraping techniques, data cleaning and transformation methodologies using DBT, object detection with YOLO, and a robust data warehouse architecture, this project delivers a valuable tool for analyzing Ethiopian medical business data. The exposed API using FastAPI further enhances accessibility and utility, enabling Kara Solutions and their clients to efficiently query and utilize the collected insights. The key takeaway is the ability to leverage modern data engineering and AI techniques to transform raw, unstructured data into actionable intelligence, ultimately driving better decision-making within the Ethiopian medical business sector. Future work can focus on improving the accuracy of object detection, expanding the data sources, and refining the API to offer more sophisticated analytical capabilities.
+````
+
+
